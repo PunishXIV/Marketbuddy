@@ -35,4 +35,8 @@
         <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(HOME)/.xlcore/dalamud/Hooks/dev/</DalamudLibPath>
         <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(HOME)/Library/Application Support/XIV on Mac/dalamud/Hooks/dev/</DalamudLibPath>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="Marketbuddy.json" />
+    </ItemGroup>
 </Project>

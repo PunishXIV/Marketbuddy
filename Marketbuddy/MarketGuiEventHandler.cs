@@ -120,7 +120,7 @@ namespace Marketbuddy
             if (!IPCManager.IsLocked)
             {
                 if (conf.AutoInputNewPrice || conf.SaveToClipboard)
-                    if (eventType == 35 && nodeParam != IntPtr.Zero) // && (*eventInfoStruct) != null ) // click
+                    if ((int)eventType == 35 && nodeParam != IntPtr.Zero) // && (*eventInfoStruct) != null ) // click
                         try
                         {
                             //AtkUldManager uldManager = (*eventInfoStruct)->UldManager;

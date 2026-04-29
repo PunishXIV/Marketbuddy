@@ -1,5 +1,13 @@
-﻿# Marketbuddy
- Plugin for XivLauncher/Dalamud to help with your day-to-day market operations. 
+# Marketbuddy
+
+Plugin for XivLauncher/Dalamud to help with your day-to-day market operations.
+
+## How to get
+
+1. Dalamud settings -> Experimental
+2. Add `https://raw.githubusercontent.com/Chalkos/Marketbuddy/main/repo.json` and enable it
+3. Install from the plugin list
+
 ## Commands
 
 * `/mbuddy` plugin config
@@ -86,19 +94,3 @@ Holding SHIFT prevents some automation, but you're better off just disabling wha
 * 0.2.0.0
   * API4 support
   * Add option to limit the stack size when posting new items
-## This plugin is in development
-This means that there are still features that I would like to implement in future or features that I would like to enhance, as well as that I'm accepting suggestions and feature requests.
-## Installation
-1. Install [FFXIVQuickLauncher](https://github.com/goatcorp/FFXIVQuickLauncher?tab=readme-ov-file#xivlauncher-----) and enable Dalamud in it's settings. You have to run the game through FFXIVQuickLauncher in order for any of these plugins to work.
-2. Open Dalamud settings by typing `/xlsettings` in game chat.
-3. Go to "Experimental" tab.
-4. Find "Custom Plugin Repositories" section, agree with listed terms if needed and paste the following link into text input field: `https://love.puni.sh/ment.json`
-5. Click "Save" button.
-
-You should now have Puni.sh plugins available in your plugin installer. <br>
-Open plugin installer by typing `/xlplugins` in game chat, go to "Available plugins" section and search for a plugin you would like to install.
-
-![image](https://github.com/NightmareXIV/MyDalamudPlugins/blob/main/meta/install/installerPunish.png?raw=true)
-
-## Support
-Join [Puni.sh Discord](https://discord.gg/Zzrcc8kmvy) to receive support for the plugin.

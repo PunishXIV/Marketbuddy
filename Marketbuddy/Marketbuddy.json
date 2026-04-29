@@ -1,6 +1,7 @@
 {
-    "Author": "Chalkos",
-    "Name": "Marketbuddy",
-    "Punchline": "Less clicks, more gil!",
-    "Description": "Helper for your day-to-day market operations.",
+  "Author": "Chalkos, NightmareXIV",
+  "Name": "Marketbuddy",
+  "Punchline": "Less clicks, more gil!",
+  "Description": "Helper for your day-to-day market operations.",
+  "DalamudApiLevel":  15
 }
