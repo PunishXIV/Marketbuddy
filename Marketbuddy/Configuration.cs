@@ -28,6 +28,18 @@ namespace Marketbuddy
         public bool UndercutUsePercent = false;
         public int UndercutPercent = 1;
 
+        /// <summary>
+        /// If enabled, the final undercut price is rounded down to the nearest multiple of <see cref="PriceRoundingMultiple"/>
+        /// (while still remaining strictly below the selected price).
+        /// </summary>
+        public bool EnablePriceRounding = false;
+
+        /// <summary>
+        /// The multiple used when <see cref="EnablePriceRounding"/> is enabled.
+        /// Example: multiple=5 will yield prices ending in 0 or 5.
+        /// </summary>
+        public int PriceRoundingMultiple = 5;
+
         public int Version { get; set; } = 0;
 
         // the below exist just to make saving/loading less cumbersome
@@ -58,6 +70,9 @@ namespace Marketbuddy
                 //    conf.HoldShiftToStop = false;
                 if (conf.UndercutPrice < 0)
                     conf.UndercutPrice = 0;
+
+                if (conf.PriceRoundingMultiple < 1)
+                    conf.PriceRoundingMultiple = 1;
             }
 
             _cachedConfig = conf;

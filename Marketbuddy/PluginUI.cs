@@ -159,15 +159,29 @@ namespace Marketbuddy
             ImGui.SameLine();
             ImGui.TextUnformatted("undercut over the selected price");
 
+            ImGui.Spacing();
+            DrawNestIndicator(1);
+            if (ImGui.Checkbox("Round the final undercut price down to a multiple", ref conf.EnablePriceRounding))
+                conf.Save();
+
+            DrawNestIndicator(2);
+            if (!conf.EnablePriceRounding) PushStyleDisabled();
+            ImGui.SetNextItemWidth(45);
+            if (ImGui.InputInt("##priceroundmultiple", ref conf.PriceRoundingMultiple, 0))
+                PriceRoundingChanged();
+            ImGui.SameLine();
+            ImGui.TextUnformatted("multiple (e.g., 5 => ...0 / ...5)");
+            if (!conf.EnablePriceRounding) PopStyleDisabled();
+
             DrawNestIndicator(1);
             if (ImGui.Checkbox(
-                    $"Clicking a price copies that price with a {GetUndercutText()} undercut to the clipboard",
+                    $"Clicking a price copies that price with a {GetUndercutText()} undercut (plus any rounding) to the clipboard",
                     ref conf.SaveToClipboard))
                 conf.Save();
 
             DrawNestIndicator(1);
             if (ImGui.Checkbox(
-                    $"Clicking a price sets your price as that price with a {GetUndercutText()} undercut",
+                    $"Clicking a price sets your price as that price with a {GetUndercutText()} undercut (plus any rounding)",
                     ref conf.AutoInputNewPrice))
             {
                 if (!conf.AutoInputNewPrice)
@@ -231,7 +245,7 @@ namespace Marketbuddy
             }
             else
             {
-                return $"{conf.UndercutPrice}gil";
+                return $"{conf.UndercutPrice} gil";
             }
         }
 
@@ -249,6 +263,13 @@ namespace Marketbuddy
                 conf.UndercutPrice = 0;
             if (conf.UndercutPercent > 99) conf.UndercutPercent = 99;
             if (conf.UndercutPercent < 0) conf.UndercutPercent = 0;
+            conf.Save();
+        }
+
+        private void PriceRoundingChanged()
+        {
+            if (conf.PriceRoundingMultiple < 1)
+                conf.PriceRoundingMultiple = 1;
             conf.Save();
         }
 

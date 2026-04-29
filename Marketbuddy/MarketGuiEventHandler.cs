@@ -126,7 +126,21 @@ namespace Marketbuddy
                             //AtkUldManager uldManager = (*eventInfoStruct)->UldManager;
 #pragma warning disable IDE0004
                             //casts are necessary
-                            var price = conf.UndercutUsePercent ? (int)((float)getPricePerItem(nodeParam) * (1f - (float)conf.UndercutPercent / 100f)) : getPricePerItem(nodeParam) - conf.UndercutPrice;
+                            var selectedPrice = getPricePerItem(nodeParam);
+                            var price = conf.UndercutUsePercent
+                                ? (int)((float)selectedPrice * (1f - (float)conf.UndercutPercent / 100f))
+                                : selectedPrice - conf.UndercutPrice;
+
+                            // Optional: make the last digits consistent by rounding down to the nearest multiple.
+                            // Ensures we stay strictly below the selected price ("next lowest multiple").
+                            if (conf.EnablePriceRounding)
+                            {
+                                var multiple = Math.Max(1, conf.PriceRoundingMultiple);
+                                var rounded = price - (price % multiple);
+                                if (rounded >= selectedPrice)
+                                    rounded -= multiple;
+                                price = rounded;
+                            }
 #pragma warning restore IDE0004
                             price =
                                 price < Configuration.MIN_PRICE ? Configuration.MIN_PRICE
