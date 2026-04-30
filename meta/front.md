@@ -20,7 +20,9 @@ Each feature can be configured in the plugin config.
 Holding SHIFT prevents some automation, but you're better off just disabling whatever you don't want in the config.
 
 ## Changelog
-
+<details>
+ <summary>Click to expand</summary>
+ 
 * 0.2.4.1
   * update for api14 and 7.4 (thanks Cyenia)
 * 0.2.4.0
@@ -84,3 +86,5 @@ Holding SHIFT prevents some automation, but you're better off just disabling wha
 * 0.2.0.0
   * API4 support
   * Add option to limit the stack size when posting new items
+ 
+</details>
