@@ -88,3 +88,4 @@ Holding SHIFT prevents some automation, but you're better off just disabling wha
   * Add option to limit the stack size when posting new items
  
 </details>
+
