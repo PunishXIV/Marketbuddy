@@ -86,10 +86,44 @@ namespace Marketbuddy
                 DrawUndercutTypeSelector();
                 ImGui.SameLine();
                 ImGui.Text("undercut");
+
+                ImGui.SameLine();
+                ImGui.Dummy(new(10, 1));
+                ImGui.SameLine();
+                DrawBulkUndercutButton();
             }
 
             ImGui.PopStyleVar(5);
             ImGui.End();
+        }
+
+        private void DrawBulkUndercutButton()
+        {
+            var orch = marketbuddy.BulkOrchestrator;
+            if (orch.IsRunning)
+            {
+                if (ImGui.Button("Stop"))
+                    orch.Stop();
+                if (ImGui.IsItemHovered())
+                    ImGui.SetTooltip("Stop the bulk undercut run.");
+            }
+            else
+            {
+                if (ImGui.Button("Undercut all"))
+                    orch.Start();
+                if (ImGui.IsItemHovered())
+                {
+                    var prereqsOk = conf.AutoOpenComparePrices && conf.AutoInputNewPrice && conf.AutoConfirmNewPrice;
+                    var tip = "Undercut every item on this retainer against the cheapest competitor.\n" +
+                              $"Uses your current undercut ({GetUndercutText()}).";
+                    if (conf.BulkUndercutSkipIfTooLow)
+                        tip += $"\nSkips items whose cheapest competitor is {conf.BulkUndercutSkipPercent}% or more below your current price.";
+                    if (!prereqsOk)
+                        tip += "\n\nWarning: requires 'Open current prices list', 'Click a price sets your price', " +
+                               "and 'Closes the price list and confirms' to be enabled in /mbuddy.";
+                    ImGui.SetTooltip(tip);
+                }
+            }
         }
 
         public void DrawSettingsWindow()
@@ -203,6 +237,33 @@ namespace Marketbuddy
             if (!conf.AutoInputNewPrice) PopStyleDisabled();
 
             ImGui.Spacing();
+            if (ImGui.Checkbox("Bulk undercut: skip an item when the cheapest competitor is far below your current price",
+                    ref conf.BulkUndercutSkipIfTooLow))
+                conf.Save();
+
+            DrawNestIndicator(1);
+            if (!conf.BulkUndercutSkipIfTooLow) PushStyleDisabled();
+            ImGui.SetNextItemWidth(45);
+            if (ImGui.InputInt("##bulkskippct", ref conf.BulkUndercutSkipPercent, 0))
+                BulkUndercutSkipPercentChanged();
+            ImGui.SameLine();
+            ImGui.TextUnformatted("% or more below your current price -> skip");
+            if (!conf.BulkUndercutSkipIfTooLow) PopStyleDisabled();
+
+            DrawNestIndicator(1);
+            ImGui.SetNextItemWidth(70);
+            if (ImGui.InputInt("##bulkdelay", ref conf.BulkInterItemDelayMs, 0))
+                BulkDelayChanged();
+            ImGui.SameLine();
+            ImGui.TextUnformatted("ms base delay between items");
+            DrawNestIndicator(1);
+            ImGui.SetNextItemWidth(70);
+            if (ImGui.InputInt("##bulkjitter", ref conf.BulkInterItemDelayJitterMs, 0))
+                BulkDelayChanged();
+            ImGui.SameLine();
+            ImGui.TextUnformatted("ms random jitter added on top (avoids server rate limit)");
+
+            ImGui.Spacing();
             if (ImGui.Checkbox("Limit stack size to", ref conf.UseMaxStackSize))
                 conf.Save();
 
@@ -270,6 +331,20 @@ namespace Marketbuddy
         {
             if (conf.PriceRoundingMultiple < 1)
                 conf.PriceRoundingMultiple = 1;
+            conf.Save();
+        }
+
+        private void BulkUndercutSkipPercentChanged()
+        {
+            if (conf.BulkUndercutSkipPercent < 0) conf.BulkUndercutSkipPercent = 0;
+            if (conf.BulkUndercutSkipPercent > 99) conf.BulkUndercutSkipPercent = 99;
+            conf.Save();
+        }
+
+        private void BulkDelayChanged()
+        {
+            if (conf.BulkInterItemDelayMs < 0) conf.BulkInterItemDelayMs = 0;
+            if (conf.BulkInterItemDelayJitterMs < 0) conf.BulkInterItemDelayJitterMs = 0;
             conf.Save();
         }
 

@@ -26,6 +26,8 @@ namespace Marketbuddy
 
         internal MarketGuiEventHandler MarketGuiEventHandler { get; private set; }
 
+        internal BulkUndercutOrchestrator BulkOrchestrator { get; private set; }
+
         // Assembly compatible with dev & published versions 
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
         public string Name => "Marketbuddy";
@@ -35,8 +37,10 @@ namespace Marketbuddy
             try
             {
                 DalamudInitialize(pluginInterface);
-                
-                MarketGuiEventHandler = new MarketGuiEventHandler();
+
+                MarketGuiEventHandler = new MarketGuiEventHandler(this);
+
+                BulkOrchestrator = new BulkUndercutOrchestrator(this);
 
                 PluginUi = new PluginUI(this);
 
@@ -64,6 +68,7 @@ namespace Marketbuddy
             PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUi;
             Common.Dalamud.CommandManager.RemoveHandler(commandName);
             PluginUi.Dispose();
+            BulkOrchestrator.Dispose();
             MarketGuiEventHandler.Dispose();
             Commons.Dispose();
         }
