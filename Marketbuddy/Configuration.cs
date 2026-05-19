@@ -40,6 +40,29 @@ namespace Marketbuddy
         /// </summary>
         public int PriceRoundingMultiple = 5;
 
+        /// <summary>
+        /// When true, the bulk-undercut button skips an item if the cheapest competitor's price
+        /// is at least <see cref="BulkUndercutSkipPercent"/>% below the player's current price.
+        /// </summary>
+        public bool BulkUndercutSkipIfTooLow = true;
+
+        /// <summary>
+        /// Skip threshold (percent) for the bulk-undercut button. See <see cref="BulkUndercutSkipIfTooLow"/>.
+        /// </summary>
+        public int BulkUndercutSkipPercent = 25;
+
+        /// <summary>
+        /// Base delay (milliseconds) inserted between processing each item during a bulk-undercut run.
+        /// Required because issuing market-board queries too fast triggers a server-side "retry later" error.
+        /// </summary>
+        public int BulkInterItemDelayMs = 3000;
+
+        /// <summary>
+        /// Random jitter (milliseconds) added on top of <see cref="BulkInterItemDelayMs"/>. The actual delay
+        /// per item is base + Random(0..jitter). Mostly to make the cadence less mechanical.
+        /// </summary>
+        public int BulkInterItemDelayJitterMs = 1500;
+
         public int Version { get; set; } = 0;
 
         // the below exist just to make saving/loading less cumbersome
@@ -73,6 +96,16 @@ namespace Marketbuddy
 
                 if (conf.PriceRoundingMultiple < 1)
                     conf.PriceRoundingMultiple = 1;
+
+                if (conf.BulkUndercutSkipPercent < 0)
+                    conf.BulkUndercutSkipPercent = 0;
+                if (conf.BulkUndercutSkipPercent > 99)
+                    conf.BulkUndercutSkipPercent = 99;
+
+                if (conf.BulkInterItemDelayMs < 0)
+                    conf.BulkInterItemDelayMs = 0;
+                if (conf.BulkInterItemDelayJitterMs < 0)
+                    conf.BulkInterItemDelayJitterMs = 0;
             }
 
             _cachedConfig = conf;

@@ -30,6 +30,7 @@ namespace Marketbuddy.Common
         [PluginService] public static IPluginLog Log { get; private set; } = null!;
         [PluginService] public static IGameInteropProvider Hook { get; private set; } = null!;
         [PluginService] public static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
+        [PluginService] public static IFramework Framework { get; private set; } = null!;
         //[PluginService] public static FlyTextGui             _FlyTexts        { get; private set; } = null!;
         //[PluginService] public static ToastGui               _Toasts          { get; private set; } = null!;
         //[PluginService] public static JobGauges              _Gauges          { get; private set; } = null!;

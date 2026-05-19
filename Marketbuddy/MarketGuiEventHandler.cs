@@ -21,10 +21,13 @@ namespace Marketbuddy
     {
         internal Configuration conf => Configuration.GetOrLoad();
 
-        private IntPtr AddonRetainerSellList = IntPtr.Zero;
+        internal IntPtr AddonRetainerSellList = IntPtr.Zero;
 
-        public MarketGuiEventHandler()
+        private readonly Marketbuddy plugin;
+
+        public MarketGuiEventHandler(Marketbuddy plugin)
         {
+            this.plugin = plugin;
             AddonLifecycle.RegisterListener(AddonEvent.PostReceiveEvent, "ItemSearchResult", OnItemSearchResultReceiveEvent);
 
             AddonLifecycle.RegisterListener(AddonEvent.PostSetup, "RetainerSell", OnRetainerSellSetup);
@@ -85,7 +88,7 @@ namespace Marketbuddy
 
             if (!IPCManager.IsLocked)
             {
-                if (conf.HoldCtrlToPaste && Keys[VirtualKey.CONTROL])
+                if (conf.HoldCtrlToPaste && Keys[VirtualKey.CONTROL] && plugin.BulkOrchestrator?.IsRunning != true)
                 {
                     var cbValue = ImGuiEx.GetClipboardText();
                     if (int.TryParse(cbValue, out var priceValue) && priceValue > 0)
@@ -117,36 +120,14 @@ namespace Marketbuddy
             var eventArgs = (AddonReceiveEventArgs)args;
             var eventType = eventArgs.AtkEventType;
             var nodeParam = eventArgs.AtkEventData;
-            if (!IPCManager.IsLocked)
+            if (!IPCManager.IsLocked && plugin.BulkOrchestrator?.IsRunning != true)
             {
                 if (conf.AutoInputNewPrice || conf.SaveToClipboard)
                     if ((int)eventType == 35 && nodeParam != IntPtr.Zero) // && (*eventInfoStruct) != null ) // click
                         try
                         {
-                            //AtkUldManager uldManager = (*eventInfoStruct)->UldManager;
-#pragma warning disable IDE0004
-                            //casts are necessary
                             var selectedPrice = getPricePerItem(nodeParam);
-                            var price = conf.UndercutUsePercent
-                                ? (int)((float)selectedPrice * (1f - (float)conf.UndercutPercent / 100f))
-                                : selectedPrice - conf.UndercutPrice;
-
-                            // Optional: make the last digits consistent by rounding down to the nearest multiple.
-                            // Ensures we stay strictly below the selected price ("next lowest multiple").
-                            if (conf.EnablePriceRounding)
-                            {
-                                var multiple = Math.Max(1, conf.PriceRoundingMultiple);
-                                var rounded = price - (price % multiple);
-                                if (rounded >= selectedPrice)
-                                    rounded -= multiple;
-                                price = rounded;
-                            }
-#pragma warning restore IDE0004
-                            price =
-                                price < Configuration.MIN_PRICE ? Configuration.MIN_PRICE
-                                : price > Configuration.MAX_PRICE ? Configuration.MAX_PRICE
-                                : price;
-
+                            var price = ComputeUndercutPrice(selectedPrice, conf);
                             SetPrice(price);
                         }
                         catch (Exception e)
@@ -156,6 +137,28 @@ namespace Marketbuddy
                             Log.Error(e, "Error getting price per item or setting the new price");
                         }
             }
+        }
+
+        internal static int ComputeUndercutPrice(int selectedPrice, Configuration conf)
+        {
+            var price = conf.UndercutUsePercent
+                ? (int)((float)selectedPrice * (1f - (float)conf.UndercutPercent / 100f))
+                : selectedPrice - conf.UndercutPrice;
+
+            // Optional: make the last digits consistent by rounding down to the nearest multiple.
+            // Ensures we stay strictly below the selected price ("next lowest multiple").
+            if (conf.EnablePriceRounding)
+            {
+                var multiple = Math.Max(1, conf.PriceRoundingMultiple);
+                var rounded = price - (price % multiple);
+                if (rounded >= selectedPrice)
+                    rounded -= multiple;
+                price = rounded;
+            }
+
+            return price < Configuration.MIN_PRICE ? Configuration.MIN_PRICE
+                 : price > Configuration.MAX_PRICE ? Configuration.MAX_PRICE
+                 : price;
         }
 
         internal unsafe bool AddonRetainerSellList_Position(out Vector2 position)
@@ -181,7 +184,7 @@ namespace Marketbuddy
             AddonLifecycle.UnregisterListener(AddonEvent.PreFinalize, "RetainerSellList", OnRetainerSellListFinalize);
         }
 
-        private unsafe void SetPrice(int newPrice)
+        internal unsafe void SetPrice(int newPrice)
         {
             var retainerSell = Commons.GetUnitBase("RetainerSell");
             if (retainerSell == null) return;
@@ -234,7 +237,7 @@ namespace Marketbuddy
             Commons.SendClick(new IntPtr(addonRetainerSell), EventType.CHANGE, 21, addonRetainerSell->Confirm);
         }
 
-        private unsafe int getPricePerItem(IntPtr /* AtkResNode* */ nodeParam)
+        internal unsafe int getPricePerItem(IntPtr /* AtkResNode* */ nodeParam)
         {
             var listAtkResNode = (AtkResNode*)nodeParam;
 
