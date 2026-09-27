@@ -3,5 +3,6 @@
   "Name": "Marketbuddy",
   "Punchline": "Less clicks, more gil!",
   "Description": "Helper for your day-to-day market operations.",
-  "DalamudApiLevel":  15
+  "DalamudApiLevel":  15,
+  "IconUrl": "https://s3.puni.sh/media/plugin/131/icon-qzhqz1nooi.png"
 }
